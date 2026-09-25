@@ -5,7 +5,7 @@ expanding the explorable map over time.
 
 ## Status
 
-![In-engine screenshot: a cultivator in jade robes by a mountain gate, cherry groves and pine forest under a painted morning sky](docs/screenshot.png)
+![In-engine screenshot: a cultivator in jade robes on a flowering meadow by a pavilion, with cherry, maple and pine groves under a painted morning sky](docs/screenshot.png)
 
 Milestone 1 (exploration + movement core) is in place: a third-person
 cultivator controller with sprint, jump, and a qinggong (light-body) air-leap
@@ -21,7 +21,7 @@ dusk colours and stars. See `docs/DESIGN.md` for how it's built and
 
 | | |
 |---|---|
-| ![Female cultivator in white hanfu in front of the spawn shrine](docs/screenshots/female_cultivator.png) | ![Male cultivator in jade robes with a sword on his back](docs/screenshots/male_cultivator.png) |
+| ![Female cultivator in white hanfu on a lakeside meadow](docs/screenshots/female_cultivator.png) | ![Male cultivator in jade robes with a sword on his back](docs/screenshots/male_cultivator.png) |
 | ![Midday vista over a lake, cherry groves and the mountain gate](docs/screenshots/noon_vista.png) | ![Sunset: rose and amber sky over a pavilion](docs/screenshots/sunset.png) |
 | ![Afternoon: snow-streaked peaks beyond the spawn gate](docs/screenshots/mountains.png) | ![Night: stars and moonlight over the valley](docs/screenshots/night.png) |
 
