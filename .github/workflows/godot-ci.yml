@@ -1,0 +1,68 @@
+name: Godot CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  GODOT_VERSION: "4.7.2"
+
+jobs:
+  validate:
+    name: Import & run project headless
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache Godot binary
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: ~/godot-bin
+          key: godot-${{ env.GODOT_VERSION }}-linux-x86_64
+
+      - name: Download Godot
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/godot-bin
+          curl -sSL -o /tmp/godot.zip \
+            "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q /tmp/godot.zip -d /tmp/godot-extract
+          mv "/tmp/godot-extract/Godot_v${GODOT_VERSION}-stable_linux.x86_64" ~/godot-bin/godot
+          chmod +x ~/godot-bin/godot
+
+      - name: Filter out known-benign headless/dummy-driver noise
+        run: |
+          cat > /tmp/filter_log.sh << 'FILTER'
+          #!/usr/bin/env bash
+          # Strips warnings/errors known to be artifacts of running Godot's
+          # dummy renderer/ALSA under --headless with no GPU/audio device,
+          # so real script/scene errors aren't drowned out or missed.
+          grep -viE \
+            'mesh_get_surface_count|Parameter "m" is null|ALSA lib|snd_func|ERR_CANT_OPEN|falling back to the dummy driver|Could not set V-Sync' \
+            "$1"
+          FILTER
+          chmod +x /tmp/filter_log.sh
+
+      - name: Import project (catches script/scene parse errors)
+        run: |
+          set -o pipefail
+          ~/godot-bin/godot --headless --path . --import 2>&1 | tee /tmp/import.log
+          if /tmp/filter_log.sh /tmp/import.log | grep -qiE 'ERROR'; then
+            echo "::error::Godot reported errors while importing the project"
+            /tmp/filter_log.sh /tmp/import.log | grep -iE 'ERROR' || true
+            exit 1
+          fi
+
+      - name: Run main scene headless (catches runtime errors)
+        run: |
+          set -o pipefail
+          ~/godot-bin/godot --headless --path . --quit-after 180 scenes/main/World.tscn 2>&1 | tee /tmp/run.log
+          if /tmp/filter_log.sh /tmp/run.log | grep -qiE 'ERROR'; then
+            echo "::error::Godot reported errors while running the main scene"
+            /tmp/filter_log.sh /tmp/run.log | grep -iE 'ERROR' || true
+            exit 1
+          fi
