@@ -5,8 +5,6 @@ expanding the explorable map over time.
 
 ## Status
 
-![In-engine screenshot: a cultivator in jade robes on a flowering meadow by a pavilion, with cherry, maple and pine groves under a painted morning sky](docs/screenshot.png)
-
 Milestone 1 (exploration + movement core) is in place: a third-person
 cultivator controller with sprint, jump, and a qinggong (light-body) air-leap
 + glide, all powered by a qi resource, walking on procedurally streamed
