@@ -16,11 +16,28 @@ built and `docs/ROADMAP.md` for what's next.
 ## Running it
 
 Open the project folder in **Godot 4.7+** (`project.godot` at the repo root)
-and run the main scene (`scenes/main/World.tscn`), or from the command line:
+and run the main scene (`scenes/main/World.tscn`), or from the command line.
+
+On a fresh clone, import the assets once first. The `.godot/` import cache is
+gitignored, so the `.glb` models under `assets/models/` have no imported
+`.scn` files yet, and running the scene directly won't create them:
 
 ```sh
+godot --headless --path . --import   # first run, or after adding/changing assets
 godot --path . scenes/main/World.tscn
 ```
+
+Opening the project in the editor also imports everything, so this step is
+only needed when you launch straight from the command line.
+
+### Troubleshooting
+
+If launching prints `Cannot open file 'res://.godot/imported/<model>.glb-….scn'`
+followed by `Could not preload resource file` in `world_streamer.gd` and
+`Nonexistent function 'set_target' in base 'Node3D'`, the import cache is
+missing or stale. Run the `--import` command above and try again. (The
+`set_target` error comes from the same problem: `world_streamer.gd` fails to
+parse, so its node falls back to a plain `Node3D`.)
 
 ### Controls
 
