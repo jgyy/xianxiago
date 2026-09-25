@@ -35,6 +35,7 @@ var _door_spots: Array = []           # [position, facing yaw] in front of shops
 var building_count := 0
 var unique_building_count := 0
 var npc_count := 0
+var _inside := false
 
 func setup(p_streamer: Node3D, p_player: Node3D) -> void:
 	streamer = p_streamer
@@ -56,6 +57,13 @@ func _process(_delta: float) -> void:
 	elif _root != null and d > UNLOAD_RADIUS:
 		_root.queue_free()
 		_root = null
+	# announce the town when the player walks through the walls
+	var inside: bool = streamer.town_distance(player.global_position.x, player.global_position.z) < HALF
+	if inside != _inside:
+		_inside = inside
+		var hud := get_tree().current_scene.get_node_or_null("HUD") if get_tree().current_scene else null
+		if inside and hud and hud.has_method("toast"):
+			hud.toast("青云镇 · Azure Cloud Town")
 
 func is_loaded() -> bool:
 	return _root != null

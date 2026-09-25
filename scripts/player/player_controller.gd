@@ -122,6 +122,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		)
 	if event.is_action_pressed("switch_character"):
 		set_body_type(body_type + 1)
+		var hud := get_tree().current_scene.get_node_or_null("HUD") if get_tree().current_scene else null
+		if hud and hud.has_method("toast"):
+			hud.toast(String(look.get("name", "")))
 	if event.is_action_pressed("toggle_mouse_capture"):
 		_mouse_captured = not _mouse_captured
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED if _mouse_captured else Input.MOUSE_MODE_VISIBLE
