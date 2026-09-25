@@ -5,13 +5,25 @@ expanding the explorable map over time.
 
 ## Status
 
-![In-engine screenshot: cultivator standing before misty jade mountains at dawn](docs/screenshot.png)
+![In-engine screenshot: a cultivator in jade robes by a mountain gate, cherry groves and pine forest under a painted morning sky](docs/screenshot.png)
 
 Milestone 1 (exploration + movement core) is in place: a third-person
 cultivator controller with sprint, jump, and a qinggong (light-body) air-leap
 + glide, all powered by a qi resource, walking on procedurally streamed
-open-world terrain with a day/night cycle. See `docs/DESIGN.md` for how it's
-built and `docs/ROADMAP.md` for what's next.
+open-world terrain with a day/night cycle.
+
+All art is generated with headless Blender scripts: 100 textures, 98
+world models and two rigged, animated cultivator characters (male and
+female). The terrain is splatted with those textures by height, slope and
+biome, and the sky is a painted shader with clouds, mountain silhouettes,
+dusk colours and stars. See `docs/DESIGN.md` for how it's built and
+`docs/ROADMAP.md` for what's next.
+
+| | |
+|---|---|
+| ![Female cultivator in white hanfu in front of the spawn shrine](docs/screenshots/female_cultivator.png) | ![Male cultivator in jade robes with a sword on his back](docs/screenshots/male_cultivator.png) |
+| ![Midday vista over a lake, cherry groves and the mountain gate](docs/screenshots/noon_vista.png) | ![Sunset: rose and amber sky over a pavilion](docs/screenshots/sunset.png) |
+| ![Afternoon: snow-streaked peaks beyond the spawn gate](docs/screenshots/mountains.png) | ![Night: stars and moonlight over the valley](docs/screenshots/night.png) |
 
 ## Running it
 
@@ -48,6 +60,7 @@ parse, so its node falls back to a plain `Node3D`.)
 | Jump / qinggong air-leap | Space |
 | Sprint | Shift (held) |
 | Light-body glide | Ctrl (held, while falling) |
+| Switch cultivator (male / female) | C |
 | Toggle mouse capture | Esc |
 
 ## Project layout
@@ -55,15 +68,38 @@ parse, so its node falls back to a plain `Node3D`.)
 ```
 project.godot          Godot project config, input map, autoloads
 scenes/                .tscn scene files (main/, player/, world/, ui/)
-scripts/                GDScript sources, mirrored by folder (systems/, player/, world/, ui/)
-resources/              Shared .tres resources (environment, materials)
-docs/                   DESIGN.md (architecture) and ROADMAP.md (what's next)
+scripts/               GDScript sources, mirrored by folder (systems/, player/, world/, ui/)
+resources/             Environment, shaders (terrain, sky, water), materials
+assets/textures/       100 Blender-baked PNG textures (shared by everything)
+assets/models/         98 Blender-generated .glb world models
+assets/characters/     Rigged + animated male/female cultivators (.glb)
+tools/blender/         Headless-Blender generators for all of the above
+docs/                  DESIGN.md (architecture) and ROADMAP.md (what's next)
 ```
 
-Blender isn't wired into the pipeline yet — the current milestone uses
-procedurally generated, vertex-colored terrain and primitive placeholder
-meshes so movement/terrain systems could be built and tested without needing
-hand-authored art first. Headless Blender (`blender -b --python script.py`)
-is confirmed working in this environment for scripted asset generation and
-`.glb` export — see the "Blender pipeline" section in `docs/DESIGN.md` for
-the plan to bring real assets in.
+## Art pipeline (headless Blender)
+
+```mermaid
+flowchart LR
+    B["blender -b --python\n(or pip bpy)"] --> T["gen_textures.py"]
+    B --> M["gen_models.py"]
+    B --> C["gen_characters.py"]
+    T -->|"100 PNG"| TX[assets/textures]
+    M -->|"98 GLB"| MD[assets/models]
+    C -->|"2 GLB + 6 anims each"| CH[assets/characters]
+    TX -. "GLB image URIs" .-> MD & CH
+    TX --> S["terrain / sky / water shaders"]
+    MD --> W["WorldStreamer: biomes, props,\nground cover, landmarks"]
+    CH --> P["Player: idle / walk / run /\njump / fall / glide"]
+```
+
+The models reference the shared PNGs by relative URI instead of embedding
+copies, so each texture is imported only once. Regenerate with:
+
+```sh
+python3.11 -m pip install bpy==4.5.4          # or use a Blender 4.5 binary: blender -b --python ...
+python3.11 tools/blender/gen_textures.py
+python3.11 tools/blender/gen_models.py        # add --preview DIR for thumbnails
+python3.11 tools/blender/gen_characters.py
+godot --headless --path . --import
+```

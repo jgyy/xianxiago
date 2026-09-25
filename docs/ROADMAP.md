@@ -12,12 +12,13 @@ Rough order — each step should stay playable/testable on its own.
 - [x] Qi/realm HUD
 
 ## Milestone 2 — a world worth exploring
-- [ ] Biome variation: bend the terrain noise/coloring per region (misty
-      peaks, bamboo forests, spirit-vein caves, lowland farmland)
-- [ ] Landmarks: hand-placed points of interest (a sect gate, a shrine, a
-      cave mouth) so exploration has destinations, not just procedural
-      terrain
-- [ ] Water (rivers/lakes) and a simple swim state
+- [x] Biome variation: pine forest, cherry grove, bamboo grove, maple
+      woods and meadow biomes; mountain layer with snow caps
+- [ ] More biomes: spirit-vein caves, lowland farmland
+- [x] Landmarks: procedural landmark sets (pavilions, pagodas, gates, sect
+      hall, bell tower...) plus a hand-dressed spawn shrine
+- [x] Water: lakes fill the valleys below the water line
+- [ ] Rivers and a simple swim state
 - [ ] Fall damage / qi-cushioned landing (light-body cultivators should
       take less fall damage — ties into the realm system)
 - [ ] Save/load player position + qi/realm state
@@ -42,14 +43,14 @@ Rough order — each step should stay playable/testable on its own.
 - [ ] Spirit beasts as wildlife (non-combat first, then combat-capable)
 
 ## Art pipeline (when ready to leave placeholders behind)
-- [ ] Bring in Blender-authored terrain textures / trim sheets to replace
-      vertex-coloring, or a stylized triplanar shader
-- [ ] Rigged cultivator character model + animations (idle/run/jump/glide)
-      to replace the capsule placeholder
-- [ ] Landmark set-dressing models (pagodas, torii-style gates, bridges)
-- [ ] Consider Godot's `Sprite3D`/billboard impostors or an LOD system once
-      real meshes replace the cheap procedural terrain, since draw cost
-      will go up a lot
+- [x] Blender-baked terrain textures + splatting shader (triplanar cliffs)
+- [x] Rigged male/female cultivator models + animations
+      (idle/walk/run/jump/fall/glide)
+- [x] Landmark set-dressing models (pagodas, gates, bridges, halls...)
+- [x] Visibility ranges per prop class, MultiMesh ground cover, Godot's
+      import-time mesh LODs
+- [ ] Billboard impostors for far trees if draw cost becomes a problem
+- [ ] Facial/hand detail and cloth simulation for the characters
 
 ## Engineering follow-ups (not urgent, note for later)
 - [ ] Terrain collision uses `ConcavePolygonShape3D` (trimesh) — fine at

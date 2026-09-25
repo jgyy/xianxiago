@@ -1,0 +1,34 @@
+[gd_resource type="ShaderMaterial" load_steps=15 format=3]
+
+[ext_resource type="Shader" path="res://resources/shaders/terrain.gdshader" id="1"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain_grass_albedo.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain_grass_normal.png" id="3"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain_meadow_albedo.png" id="4"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain_forest_floor_albedo.png" id="5"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain_dirt_albedo.png" id="6"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain_dirt_normal.png" id="7"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain_rock_albedo.png" id="8"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain_rock_normal.png" id="9"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain_cliff_albedo.png" id="10"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain_cliff_normal.png" id="11"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain_snow_albedo.png" id="12"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain_snow_normal.png" id="13"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain_sand_albedo.png" id="14"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain_macro.png" id="15"]
+
+[resource]
+shader = ExtResource("1")
+shader_parameter/grass_albedo = ExtResource("2")
+shader_parameter/grass_normal = ExtResource("3")
+shader_parameter/meadow_albedo = ExtResource("4")
+shader_parameter/forest_albedo = ExtResource("5")
+shader_parameter/dirt_albedo = ExtResource("6")
+shader_parameter/dirt_normal = ExtResource("7")
+shader_parameter/rock_albedo = ExtResource("8")
+shader_parameter/rock_normal = ExtResource("9")
+shader_parameter/cliff_albedo = ExtResource("10")
+shader_parameter/cliff_normal = ExtResource("11")
+shader_parameter/snow_albedo = ExtResource("12")
+shader_parameter/snow_normal = ExtResource("13")
+shader_parameter/sand_albedo = ExtResource("14")
+shader_parameter/macro_map = ExtResource("15")
