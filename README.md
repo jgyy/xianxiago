@@ -19,7 +19,7 @@ Open the project folder in **Godot 4.7+** (`project.godot` at the repo root)
 and run the main scene (`scenes/main/World.tscn`), or from the command line:
 
 ```sh
-godot4 --path . scenes/main/World.tscn
+godot --path . scenes/main/World.tscn
 ```
 
 ### Controls
