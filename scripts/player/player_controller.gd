@@ -1,6 +1,15 @@
 extends CharacterBody3D
 ## Third-person cultivator movement: walk/sprint, jump, and a qinggong
 ## ("light-body technique") air leap + glide, both powered by QiSystem.
+## The visible body is one of the Blender-made rigged cultivators (male or
+## female, toggled with C) whose idle/walk/run/jump/fall/glide animations
+## follow the movement state.
+
+const BODY_SCENES := [
+	preload("res://assets/characters/cultivator_male.glb"),
+	preload("res://assets/characters/cultivator_female.glb"),
+]
+const LOOPING_ANIMS := ["idle", "walk", "run", "fall", "glide"]
 
 @export_group("Movement")
 @export var walk_speed: float = 4.5
@@ -27,6 +36,10 @@ extends CharacterBody3D
 @onready var spring_arm: SpringArm3D = $CameraPivot/SpringArm3D
 @onready var visual: Node3D = $Visual
 
+var body_type: int = 0 ## index into BODY_SCENES (0 = male, 1 = female)
+var _body: Node3D
+var _anim: AnimationPlayer
+
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
 var _mouse_captured: bool = true
 var _used_air_leap: bool = false
@@ -35,6 +48,54 @@ var _is_gliding: bool = false
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	spring_arm.rotation.x = deg_to_rad(-15.0)
+	set_body_type(GameState.body_type)
+
+## Swaps the visible cultivator model (0 = male, 1 = female).
+func set_body_type(index: int) -> void:
+	body_type = posmod(index, BODY_SCENES.size())
+	GameState.body_type = body_type
+	if _body:
+		_body.queue_free()
+	_body = BODY_SCENES[body_type].instantiate()
+	visual.add_child(_body)
+	_anim = _find_animation_player(_body)
+	if _anim:
+		for anim_name in LOOPING_ANIMS:
+			if _anim.has_animation(anim_name):
+				_anim.get_animation(anim_name).loop_mode = Animation.LOOP_LINEAR
+		_play("idle")
+
+func _find_animation_player(node: Node) -> AnimationPlayer:
+	if node is AnimationPlayer:
+		return node
+	for child in node.get_children():
+		var found := _find_animation_player(child)
+		if found:
+			return found
+	return null
+
+func _play(anim_name: String, speed: float = 1.0) -> void:
+	if _anim == null or not _anim.has_animation(anim_name):
+		return
+	_anim.speed_scale = speed
+	if _anim.current_animation != anim_name:
+		_anim.play(anim_name, 0.18)
+
+func _update_animation() -> void:
+	var horizontal := Vector2(velocity.x, velocity.z).length()
+	if is_on_floor():
+		if horizontal < 0.3:
+			_play("idle")
+		elif horizontal < walk_speed + 0.5:
+			_play("walk", clampf(horizontal / walk_speed, 0.5, 1.4))
+		else:
+			_play("run", clampf(horizontal / sprint_speed, 0.8, 1.3))
+	elif _is_gliding:
+		_play("glide")
+	elif velocity.y > 0.5:
+		_play("jump")
+	else:
+		_play("fall")
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and _mouse_captured:
@@ -43,6 +104,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		spring_arm.rotation.x = clampf(
 			spring_arm.rotation.x, deg_to_rad(pitch_min_deg), deg_to_rad(pitch_max_deg)
 		)
+	if event.is_action_pressed("switch_character"):
+		set_body_type(body_type + 1)
 	if event.is_action_pressed("toggle_mouse_capture"):
 		_mouse_captured = not _mouse_captured
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED if _mouse_captured else Input.MOUSE_MODE_VISIBLE
@@ -57,6 +120,8 @@ func _physics_process(delta: float) -> void:
 	if is_on_floor():
 		_used_air_leap = false
 		_is_gliding = false
+
+	_update_animation()
 
 func _apply_gravity_or_glide(delta: float) -> void:
 	if is_on_floor():

@@ -32,6 +32,9 @@ signal realm_changed(new_realm: Realm)
 
 var realm: Realm = Realm.MORTAL
 
+## Which cultivator model the player uses (0 = male, 1 = female).
+var body_type: int = 0
+
 func realm_name() -> String:
 	return REALM_NAMES.get(realm, "Unknown")
 

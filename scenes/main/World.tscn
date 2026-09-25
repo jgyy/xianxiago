@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/world_root.gd" id="1"]
 [ext_resource type="Environment" path="res://resources/environment/world_environment.tres" id="2"]
@@ -6,6 +6,13 @@
 [ext_resource type="Script" path="res://scripts/world/world_streamer.gd" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="5"]
 [ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="6"]
+[ext_resource type="Material" path="res://resources/materials/water_material.tres" id="7"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_water"]
+material = ExtResource("7")
+size = Vector2(1400, 1400)
+subdivide_width = 8
+subdivide_depth = 8
 
 [node name="World" type="Node3D"]
 script = ExtResource("1")
@@ -16,11 +23,20 @@ environment = ExtResource("2")
 [node name="Sun" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.5, 0.866, 0, -0.866, 0.5, 0, 10, 0)
 shadow_enabled = true
-directional_shadow_max_distance = 150.0
+shadow_bias = 0.05
+shadow_normal_bias = 1.5
+directional_shadow_max_distance = 180.0
+directional_shadow_blend_splits = true
 script = ExtResource("3")
 
 [node name="WorldStreamer" type="Node3D" parent="."]
 script = ExtResource("4")
+
+[node name="Water" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = SubResource("PlaneMesh_water")
+
+[node name="Backdrop" type="Node3D" parent="."]
 
 [node name="Player" parent="." instance=ExtResource("5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)

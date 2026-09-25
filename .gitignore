@@ -19,3 +19,7 @@ data_*/
 # OS / editor clutter
 .DS_Store
 Thumbs.db
+
+# Python bytecode from the Blender generators
+__pycache__/
+*.pyc
