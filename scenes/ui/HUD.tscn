@@ -1,0 +1,47 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/hud.gd" id="1"]
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1")
+
+[node name="Panel" type="Control" parent="."]
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 300.0
+offset_bottom = 112.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/separation = 4
+
+[node name="RealmLabel" type="Label" parent="Panel/VBoxContainer"]
+unique_name_in_owner = true
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.92, 0.94, 0.86, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.6)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+text = "Mortal"
+
+[node name="TimeLabel" type="Label" parent="Panel/VBoxContainer"]
+unique_name_in_owner = true
+theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 1)
+text = "08:00"
+
+[node name="QiLabel" type="Label" parent="Panel/VBoxContainer"]
+unique_name_in_owner = true
+theme_override_colors/font_color = Color(0.6, 0.9, 0.85, 1)
+text = "Qi 100 / 100"
+
+[node name="QiBar" type="ProgressBar" parent="Panel/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 16)
+max_value = 100.0
+value = 100.0
+show_percentage = false
