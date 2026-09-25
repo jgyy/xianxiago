@@ -21,6 +21,13 @@ const WATER_LEVEL := -2.6
 const ROCK_HEIGHT := 8.0
 const SNOW_HEIGHT := 19.0
 
+## Azure Cloud Town (see town.gd) sits on a levelled terrace here.
+const TOWN_CENTER := Vector2(0.0, -330.0)
+const TOWN_HALF_SIZE := 150.0
+const TOWN_BLOCK := 44.0
+const TOWN_STREET_WIDTH := 8.0
+const TOWN_BLEND := 70.0
+
 const PROP_CELL_SIZE := 7.0
 const GROUND_COVER_PER_CHUNK := 150
 const LANDMARK_CHANCE := 0.16
@@ -134,10 +141,26 @@ func _process(_delta: float) -> void:
 func height_at(world_x: float, world_z: float) -> float:
 	if _noise == null:
 		return 0.0
+	var natural := _natural_height(world_x, world_z)
+	var t := smoothstep(TOWN_HALF_SIZE + 15.0, TOWN_HALF_SIZE + TOWN_BLEND, town_distance(world_x, world_z))
+	return lerpf(town_height(), natural, t)
+
+func _natural_height(world_x: float, world_z: float) -> float:
 	var base := _noise.get_noise_2d(world_x, world_z) * height_scale
 	var m := _mountain_noise.get_noise_2d(world_x, world_z)
 	var ridge := smoothstep(0.08, 0.5, m)
 	return base + pow(ridge, 1.6) * mountain_height
+
+## Square (Chebyshev) distance from the town centre, in metres.
+func town_distance(world_x: float, world_z: float) -> float:
+	return maxf(absf(world_x - TOWN_CENTER.x), absf(world_z - TOWN_CENTER.y))
+
+## Height of the town terrace: the natural ground at the centre, kept
+## comfortably above the lakes and below the snow line.
+func town_height() -> float:
+	if _noise == null:
+		return 3.0
+	return clampf(_natural_height(TOWN_CENTER.x, TOWN_CENTER.y), WATER_LEVEL + 3.5, ROCK_HEIGHT - 2.0)
 
 func slope_at(world_x: float, world_z: float) -> float:
 	var e := 1.0
@@ -269,7 +292,7 @@ func _scatter_props(coord: Vector2i, chunk: Node3D, rng: RandomNumberGenerator) 
 			var density := 0.18 if biome == Biome.MEADOW else 0.42
 			if rng.randf() > density:
 				continue
-			if Vector2(wx, wz).length() < SPAWN_CLEAR_RADIUS:
+			if Vector2(wx, wz).length() < SPAWN_CLEAR_RADIUS or town_distance(wx, wz) < TOWN_HALF_SIZE + 25.0:
 				continue
 			var h := height_at(wx, wz)
 			var band := band_at(h, slope_at(wx, wz))
@@ -284,7 +307,7 @@ func _scatter_props(coord: Vector2i, chunk: Node3D, rng: RandomNumberGenerator) 
 			place(chunk, model, Vector3(local_x, h - 0.05, local_z), rng.randf_range(0.0, TAU), s, entry["col"], entry["vis"])
 
 	# rare floating islands / cloud platforms drifting above the valleys
-	if rng.randf() < 0.12:
+	if rng.randf() < 0.12 and town_distance(origin_x + chunk_size * 0.5, origin_z + chunk_size * 0.5) > TOWN_HALF_SIZE + 80.0:
 		var lx := rng.randf_range(8.0, chunk_size - 8.0)
 		var lz := rng.randf_range(8.0, chunk_size - 8.0)
 		var gy := height_at(origin_x + lx, origin_z + lz)
@@ -338,6 +361,8 @@ func _scatter_ground_cover(coord: Vector2i, chunk: Node3D, rng: RandomNumberGene
 		var lz := rng.randf() * chunk_size
 		var h := height_at(origin_x + lx, origin_z + lz)
 		var band := band_at(h, slope_at(origin_x + lx, origin_z + lz))
+		if town_distance(origin_x + lx, origin_z + lz) < TOWN_HALF_SIZE + 5.0:
+			continue
 		if not GROUND_COVER.has(band):
 			continue
 		var options: Array = GROUND_COVER[band]
@@ -375,7 +400,7 @@ func _maybe_landmark(coord: Vector2i, chunk: Node3D, rng: RandomNumberGenerator)
 	var lz := rng.randf_range(16.0, chunk_size - 16.0)
 	var wx := origin_x + lx
 	var wz := origin_z + lz
-	if Vector2(wx, wz).length() < SPAWN_CLEAR_RADIUS + 12.0:
+	if Vector2(wx, wz).length() < SPAWN_CLEAR_RADIUS + 12.0 or town_distance(wx, wz) < TOWN_HALF_SIZE + 60.0:
 		return
 	var h := height_at(wx, wz)
 	if band_at(h, slope_at(wx, wz)) != "grass":

@@ -23,6 +23,12 @@ import xg_mesh as xm  # noqa: E402
 from xg_mesh import M  # noqa: E402
 
 FPS = 24
+DETAIL = 1.0  # 1.0 = player model, 0.5 = lighter NPC model
+
+
+def D(n, lo=6):
+    """Segment count scaled by the current detail level."""
+    return max(lo, int(round(n * DETAIL)))
 
 
 # ---------------------------------------------------------------------------
@@ -96,7 +102,7 @@ def body(J, female, skin_mat):
         skel.append((J["knee." + s], len(skel) - 1, 0.055))
         skel.append((J["ankle." + s], len(skel) - 1, 0.04))
         skel.append((J["toe." + s], len(skel) - 1, 0.035))
-    obj = xm.skin_tree("body", skel, skin_mat, subdiv=2)
+    obj = xm.skin_tree("body", skel, skin_mat, subdiv=2 if DETAIL >= 1.0 else 1)
     xm.box_uv(obj, 2.0)
     return obj
 
@@ -104,7 +110,7 @@ def body(J, female, skin_mat):
 def head(J, female, skin_mat):
     h = J["head"] + Vector((0, 0, 0.1))
     objs = []
-    skull = xm.prim("uvsphere", skin_mat, segments=40, ring_count=24, radius=0.105, loc=tuple(h))
+    skull = xm.prim("uvsphere", skin_mat, segments=D(40), ring_count=D(24), radius=0.105, loc=tuple(h))
     skull.scale = (0.88, 0.98, 1.12)
     xm.transform_apply(skull)
     for v in skull.data.vertices:  # tapered jaw
@@ -121,7 +127,7 @@ def head(J, female, skin_mat):
         ear = xm.prim("uvsphere", skin_mat, segments=12, ring_count=8, radius=0.025, loc=tuple(h + Vector((sx * 0.092, 0.0, 0.0))))
         ear.scale = (0.4, 0.8, 1.3)
         objs.append(ear)
-        eye = xm.prim("uvsphere", M("hair"), segments=16, ring_count=8, radius=0.016, loc=tuple(h + Vector((sx * 0.037, -0.088, 0.018))))
+        eye = xm.prim("uvsphere", xm.material("eye", color=(0.05, 0.04, 0.04), rough=0.2), segments=16, ring_count=8, radius=0.016, loc=tuple(h + Vector((sx * 0.037, -0.088, 0.018))))
         eye.scale = (1.3 if female else 1.1, 0.5, 0.8 if female else 0.6)
         objs.append(eye)
         shine = xm.prim("uvsphere", M("glow_white"), segments=8, ring_count=4, radius=0.004, loc=tuple(h + Vector((sx * 0.033, -0.097, 0.024))))
@@ -180,7 +186,7 @@ def robe(J, female, outer, inner, trim):
             rings.append((z0 + (z1 - z0) * f, a0 + (a1 - a0) * f, b0 + (b1 - b0) * f, 0.0, 0.0))
     rings.append((prof[-1][0], prof[-1][1], prof[-1][2], 0.0, 0.0))
     rings = [(z * s if z > 0.2 else z, rx, ry, cx, cy) for z, rx, ry, cx, cy in rings]
-    outer_obj = lathe(rings, outer, 64, "robe", uv_v=1.5)
+    outer_obj = lathe(rings, outer, D(64, 16), "robe", uv_v=1.5)
     # front overlap: open the robe slightly at the lower front with a wavy hem
     for v in outer_obj.data.vertices:
         if v.co.z < 0.5 * s:
@@ -209,14 +215,14 @@ def robe(J, female, outer, inner, trim):
         xm.box_uv(strip, 4.0)
         objs.append(strip)
     # sash
-    sash = xm.prim("torus", M("silk_crimson") if not female else M("silk_indigo"), major_radius=1.0, minor_radius=0.12,
-                   major_segments=48, minor_segments=12, loc=(0, 0, 1.02 * s))
+    sash = xm.prim("torus", SLOT["sash"], major_radius=1.0, minor_radius=0.12,
+                   major_segments=D(48), minor_segments=D(12), loc=(0, 0, 1.02 * s))
     sash.scale = (0.19 if female else 0.2, 0.15, 0.4)
     xm.transform_apply(sash)
     xm.box_uv(sash, 3.0)
     objs.append(sash)
     for k, dx in enumerate((-0.05, 0.03)):
-        tail = xm.box((dx, -0.16, 0.8 * s), (0.05, 0.012, 0.4), M("silk_crimson") if not female else M("silk_indigo"), 0.004, 2)
+        tail = xm.box((dx, -0.16, 0.8 * s), (0.05, 0.012, 0.4), SLOT["sash"], 0.004, 2)
         tail.rotation_euler.x = 0.08 * (k + 1)
         objs.append(tail)
     pend = xm.prim("uvsphere", M("jade"), segments=16, ring_count=8, radius=0.03, loc=(0.09, -0.16, 0.86 * s))
@@ -239,7 +245,7 @@ def sleeves(J, mat, female):
         pts.append(c + (c - b).normalized() * 0.09)
         radii.append(radii[-1] * 1.05)
         verts, faces, uvs = [], [], []
-        seg = 32
+        seg = D(32, 12)
         for i, (p, r) in enumerate(zip(pts, radii)):
             d = (pts[min(i + 1, len(pts) - 1)] - pts[max(i - 1, 0)]).normalized()
             side = d.cross(Vector((0, 1, 0))).normalized()
@@ -284,95 +290,180 @@ def boots(J):
     return objs
 
 
-def hair(J, female):
-    h = J["head"] + Vector((0, 0, 0.1))
-    objs = []
-    cap = xm.prim("uvsphere", M("hair"), segments=40, ring_count=24, radius=0.112, loc=tuple(h + Vector((0, 0.008, 0.012))))
-    cap.scale = (0.92, 1.0, 1.1)
-    xm.transform_apply(cap)
-    me = cap.data
-    # keep the face open: drop verts on the front-lower part of the cap
-    import bmesh
-    bm = bmesh.new()
-    bm.from_mesh(me)
-    kill = [v for v in bm.verts if (v.co.y - h.y) < -0.03 and (v.co.z - h.z) < 0.045 or (v.co.z - h.z) < -0.075]
-    bmesh.ops.delete(bm, geom=kill, context="VERTS")
-    bm.to_mesh(me)
-    bm.free()
-    xm.modifier(cap, "SOLIDIFY", thickness=0.01)
-    objs.append(cap)
-    if female:
-        for sx in (1, -1):
-            bun = xm.prim("uvsphere", M("hair"), segments=24, ring_count=12, radius=0.05, loc=tuple(h + Vector((sx * 0.075, 0.03, 0.09))))
-            objs.append(bun)
-            pin = xm.prim("cyl", M("gold"), vertices=8, radius=0.004, depth=0.09, loc=tuple(h + Vector((sx * 0.1, 0.03, 0.12))), rot=(0, sx * 1.0, 0))
-            objs.append(pin)
-            dangle = xm.prim("uvsphere", M("jade"), segments=8, ring_count=6, radius=0.01, loc=tuple(h + Vector((sx * 0.13, 0.03, 0.06))))
-            objs.append(dangle)
-        # long hair sheet down the back to the waist
-        verts, faces, uvs = [], [], []
-        rows, cols = 24, 16
-        for j in range(rows + 1):
-            t = j / rows
-            z = h.z + 0.03 - t * 0.62
-            w = 0.1 + 0.04 * math.sin(t * math.pi)
-            back = 0.1 + 0.045 * t + (0.06 if z < J["chest"].z + 0.1 else 0.0) * min(1, (J["chest"].z + 0.1 - z) / 0.1) if z < J["chest"].z + 0.1 else 0.1 + 0.045 * t
-            for i in range(cols + 1):
-                u = i / cols
-                a = (u - 0.5) * 2.2
-                verts.append((math.sin(a) * w, h.y + back * math.cos(a * 0.6) + 0.02, z))
-                uvs.append((u * 0.5, t * 3.0))
-        for j in range(rows):
-            for i in range(cols):
-                q = j * (cols + 1) + i
-                faces.append((q, q + 1, q + cols + 2, q + cols + 1))
-        sheet = xm.mesh_obj("long_hair", verts, faces, M("hair"), uvs)
-        xm.modifier(sheet, "SOLIDIFY", thickness=0.02)
-        for p in sheet.data.polygons:
-            p.use_smooth = True
-        objs.append(sheet)
-        # side locks framing the face
-        for sx in (1, -1):
-            lock = xm.prim("cyl", M("hair"), vertices=12, radius=0.018, depth=0.26, loc=tuple(h + Vector((sx * 0.09, -0.04, -0.12))))
-            for v in lock.data.vertices:
-                k = (v.co.z + 0.13) / 0.26
-                v.co.x *= 0.5 + 0.5 * k
-            objs.append(lock)
-    else:
-        bun = xm.prim("uvsphere", M("hair"), segments=24, ring_count=12, radius=0.045, loc=tuple(h + Vector((0, 0.02, 0.13))))
-        bun.scale = (1.0, 1.0, 0.85)
-        objs.append(bun)
-        crown = xm.prim("cyl", M("gold"), vertices=24, radius=0.035, depth=0.03, loc=tuple(h + Vector((0, 0.02, 0.165))))
-        objs.append(crown)
-        pin = xm.prim("cyl", M("jade"), vertices=8, radius=0.005, depth=0.13, loc=tuple(h + Vector((0, 0.02, 0.165))), rot=(0, math.pi / 2, 0))
-        objs.append(pin)
-        # ponytail falling from the topknot to the shoulder blades
-        pts = [h + Vector((0, 0.06, 0.12)), h + Vector((0, 0.13, 0.02)), h + Vector((0, 0.15, -0.15)), h + Vector((0, 0.14, -0.35))]
-        verts, faces = [], []
-        seg = 12
-        for i in range(len(pts) * 4):
-            t = i / (len(pts) * 4 - 1)
-            f = t * (len(pts) - 1)
-            k = min(int(f), len(pts) - 2)
-            p = pts[k].lerp(pts[k + 1], f - k)
-            r = 0.03 * (1 - 0.8 * t) + 0.004
-            for j in range(seg):
-                a = j / seg * math.tau
-                verts.append((p.x + math.cos(a) * r, p.y + math.sin(a) * r * 0.7, p.z))
-            if i:
-                b = len(verts) - 2 * seg
-                for j in range(seg):
-                    faces.append((b + j, b + (j + 1) % seg, b + seg + (j + 1) % seg, b + seg + j))
-        tail = xm.mesh_obj("ponytail", verts, faces, M("hair"))
-        for p in tail.data.polygons:
-            p.use_smooth = True
-        objs.append(tail)
+def _smooth_uv(objs, scale=3.0):
     for o in objs:
         for p in o.data.polygons:
             p.use_smooth = True
         if not o.data.uv_layers:
-            xm.box_uv(o, 3.0)
+            xm.box_uv(o, scale)
     return objs
+
+
+def _hair_cap(h, mat):
+    import bmesh
+    cap = xm.prim("uvsphere", mat, segments=D(40), ring_count=D(24), radius=0.112, loc=tuple(h + Vector((0, 0.008, 0.012))))
+    cap.scale = (0.92, 1.0, 1.1)
+    xm.transform_apply(cap)
+    bm = bmesh.new()
+    bm.from_mesh(cap.data)
+    # keep the face open: drop verts on the front-lower part of the cap
+    kill = [v for v in bm.verts if (v.co.y - h.y) < -0.03 and (v.co.z - h.z) < 0.045 or (v.co.z - h.z) < -0.075]
+    bmesh.ops.delete(bm, geom=kill, context="VERTS")
+    bm.to_mesh(cap.data)
+    bm.free()
+    xm.modifier(cap, "SOLIDIFY", thickness=0.01)
+    return cap
+
+
+def _hair_sheet(J, h, mat, length=0.62, width=0.1):
+    """Long hair falling down the back."""
+    verts, faces, uvs = [], [], []
+    rows, cols = D(24, 8), D(16, 8)
+    for j in range(rows + 1):
+        t = j / rows
+        z = h.z + 0.03 - t * length
+        w = width + 0.04 * math.sin(t * math.pi)
+        back = 0.1 + 0.045 * t
+        if z < J["chest"].z + 0.1:
+            back += 0.06 * min(1.0, (J["chest"].z + 0.1 - z) / 0.1)
+        for i in range(cols + 1):
+            u = i / cols
+            a = (u - 0.5) * 2.2
+            verts.append((math.sin(a) * w, h.y + back * math.cos(a * 0.6) + 0.02, z))
+            uvs.append((u * 0.5, t * 3.0))
+    for j in range(rows):
+        for i in range(cols):
+            q = j * (cols + 1) + i
+            faces.append((q, q + 1, q + cols + 2, q + cols + 1))
+    sheet = xm.mesh_obj("long_hair", verts, faces, mat, uvs)
+    xm.modifier(sheet, "SOLIDIFY", thickness=0.02)
+    return sheet
+
+
+def _tube(pts, r0, r1, mat, name="tube"):
+    verts, faces = [], []
+    seg = D(12, 6)
+    n = len(pts) * 4
+    for i in range(n):
+        t = i / (n - 1)
+        f = t * (len(pts) - 1)
+        k = min(int(f), len(pts) - 2)
+        p = pts[k].lerp(pts[k + 1], f - k)
+        r = r0 + (r1 - r0) * t
+        for j in range(seg):
+            a = j / seg * math.tau
+            verts.append((p.x + math.cos(a) * r, p.y + math.sin(a) * r * 0.75, p.z))
+        if i:
+            b = len(verts) - 2 * seg
+            for j in range(seg):
+                faces.append((b + j, b + (j + 1) % seg, b + seg + (j + 1) % seg, b + seg + j))
+    return xm.mesh_obj(name, verts, faces, mat)
+
+
+def hair_styles(J, female):
+    """Returns {style_name: [objects]}; every style includes its own cap so
+    exactly one style is shown at a time."""
+    h = J["head"] + Vector((0, 0, 0.1))
+    mat = SLOT["hair"]
+    gold, jade = M("gold"), M("jade")
+    styles = {}
+    if female:
+        # twin buns with gold pins and jade drops (default)
+        o = [_hair_cap(h, mat), _hair_sheet(J, h, mat)]
+        for sx in (1, -1):
+            o.append(xm.prim("uvsphere", mat, segments=D(24), ring_count=D(12), radius=0.05, loc=tuple(h + Vector((sx * 0.075, 0.03, 0.09)))))
+            o.append(xm.prim("cyl", gold, vertices=8, radius=0.004, depth=0.09, loc=tuple(h + Vector((sx * 0.1, 0.03, 0.12))), rot=(0, sx * 1.0, 0)))
+            o.append(xm.prim("uvsphere", jade, segments=8, ring_count=6, radius=0.01, loc=tuple(h + Vector((sx * 0.13, 0.03, 0.06)))))
+        styles["twin_buns"] = o
+        # long straight hair with a centre part and side locks
+        o = [_hair_cap(h, mat), _hair_sheet(J, h, mat, 0.72, 0.11)]
+        for sx in (1, -1):
+            o.append(_tube([h + Vector((sx * 0.09, -0.04, 0.0)), h + Vector((sx * 0.1, -0.03, -0.18)), h + Vector((sx * 0.1, -0.01, -0.34))], 0.02, 0.008, mat))
+        styles["long_straight"] = o
+        # high ponytail with ribbon
+        o = [_hair_cap(h, mat)]
+        o.append(xm.prim("uvsphere", mat, segments=D(20), ring_count=D(10), radius=0.04, loc=tuple(h + Vector((0, 0.07, 0.11)))))
+        o.append(_tube([h + Vector((0, 0.09, 0.12)), h + Vector((0, 0.17, 0.0)), h + Vector((0, 0.18, -0.25)), h + Vector((0, 0.16, -0.5))], 0.035, 0.006, mat, "ponytail"))
+        o.append(xm.prim("torus", SLOT["sash"], major_radius=0.035, minor_radius=0.01, loc=tuple(h + Vector((0, 0.1, 0.1))), rot=(1.2, 0, 0)))
+        styles["high_ponytail"] = o
+        # elegant single bun with crossed hairpins and a floral ornament
+        o = [_hair_cap(h, mat)]
+        o.append(xm.prim("uvsphere", mat, segments=D(24), ring_count=D(12), radius=0.06, loc=tuple(h + Vector((0, 0.07, 0.08)))))
+        for a in (0.7, -0.7):
+            o.append(xm.prim("cyl", gold, vertices=8, radius=0.004, depth=0.2, loc=tuple(h + Vector((0, 0.08, 0.09))), rot=(0, a, 0)))
+        o.append(xm.prim("uvsphere", M("lotus_flower"), segments=12, ring_count=6, radius=0.025, loc=tuple(h + Vector((0.05, 0.05, 0.13)))))
+        styles["pinned_bun"] = o
+        # long braid over the shoulder
+        o = [_hair_cap(h, mat)]
+        pts = [h + Vector((0.06, 0.08, -0.05)), h + Vector((0.12, 0.02, -0.2)), h + Vector((0.14, -0.08, -0.4)), h + Vector((0.12, -0.1, -0.62))]
+        for k in range(3):
+            off = Vector((math.cos(k * 2.1) * 0.012, math.sin(k * 2.1) * 0.012, 0))
+            o.append(_tube([p + off for p in pts], 0.022, 0.012, mat, "braid"))
+        o.append(xm.prim("torus", SLOT["sash"], major_radius=0.018, minor_radius=0.007, loc=tuple(pts[-1])))
+        styles["side_braid"] = o
+    else:
+        def topknot(extra_crown=False):
+            o = [xm.prim("uvsphere", mat, segments=D(24), ring_count=D(12), radius=0.045, loc=tuple(h + Vector((0, 0.02, 0.13))))]
+            o[0].scale = (1.0, 1.0, 0.85)
+            o.append(xm.prim("cyl", gold, vertices=D(24), radius=0.035 if not extra_crown else 0.05, depth=0.03 if not extra_crown else 0.06,
+                             loc=tuple(h + Vector((0, 0.02, 0.165)))))
+            o.append(xm.prim("cyl", jade, vertices=8, radius=0.005, depth=0.13, loc=tuple(h + Vector((0, 0.02, 0.165))), rot=(0, math.pi / 2, 0)))
+            return o
+        styles["topknot"] = [_hair_cap(h, mat)] + topknot() + [
+            _tube([h + Vector((0, 0.06, 0.12)), h + Vector((0, 0.13, 0.02)), h + Vector((0, 0.15, -0.15)), h + Vector((0, 0.14, -0.35))], 0.03, 0.004, mat, "ponytail")]
+        styles["crowned_knot"] = [_hair_cap(h, mat)] + topknot(True)
+        styles["long_loose"] = [_hair_cap(h, mat), _hair_sheet(J, h, mat, 0.55, 0.1)] + topknot()[:1]
+        styles["half_up"] = [_hair_cap(h, mat), _hair_sheet(J, h, mat, 0.4, 0.1)] + topknot()
+        o = [_hair_cap(h, mat)]
+        o.append(xm.prim("cyl", SLOT["sash"], vertices=D(32), radius=0.108, depth=0.04, loc=tuple(h + Vector((0, 0.008, 0.03)))))
+        styles["headband"] = o
+    for objs in styles.values():
+        _smooth_uv(objs)
+    return styles
+
+
+def accessories(J, female):
+    """Optional pieces toggled per variation: {name: ([objects], allowed_bones)}."""
+    h = J["head"] + Vector((0, 0, 0.1))
+    acc = {}
+    # conical bamboo douli hat
+    hat = xm.prim("cone", M("wood"), vertices=D(40), radius1=0.34, radius2=0.01, depth=0.14, loc=tuple(h + Vector((0, 0.01, 0.16))))
+    rim = xm.prim("torus", M("leather"), major_radius=0.34, minor_radius=0.006, major_segments=D(40), loc=tuple(h + Vector((0, 0.01, 0.09))))
+    acc["hat"] = (_smooth_uv([hat, rim], 2.0), HEADB)
+    if female:
+        acc["ribbon"] = (_smooth_uv([ribbon(J)]), ARMS + ["spine"])
+        veil = xm.prim("cyl", M("silk_white"), vertices=D(32), radius=0.12, depth=0.1, loc=tuple(h + Vector((0, -0.01, -0.05))))
+        veil.scale = (1.0, 1.0, 1.0)
+        acc["veil"] = (_smooth_uv([veil]), HEADB)
+        acc["flute"] = (_smooth_uv([xm.prim("cyl", M("bamboo"), vertices=12, radius=0.012, depth=0.5,
+                                            loc=(0.16, 0.12, J["hips"].z + 0.05), rot=(0, 0.5, 0))]), ["hips", "spine"])
+    else:
+        acc["sword"] = (_smooth_uv(sword_on_back(J)), ["chest"])
+        beard = _tube([h + Vector((0, -0.08, -0.07)), h + Vector((0, -0.09, -0.13)), h + Vector((0, -0.07, -0.2))], 0.03, 0.005, SLOT["hair"], "beard")
+        mus = []
+        for sx in (1, -1):
+            mus.append(_tube([h + Vector((sx * 0.01, -0.1, -0.045)), h + Vector((sx * 0.04, -0.095, -0.06)), h + Vector((sx * 0.05, -0.085, -0.1))], 0.006, 0.002, SLOT["hair"], "moustache"))
+        acc["beard"] = (_smooth_uv([beard] + mus), HEADB)
+        gourd_a = xm.prim("uvsphere", M("wood"), segments=16, ring_count=8, radius=0.06, loc=(0.2, 0.05, J["hips"].z - 0.08))
+        gourd_b = xm.prim("uvsphere", M("wood"), segments=16, ring_count=8, radius=0.04, loc=(0.2, 0.05, J["hips"].z + 0.01))
+        acc["gourd"] = (_smooth_uv([gourd_a, gourd_b]), ["hips"])
+    cape_v, cape_f = [], []
+    rows, cols = D(16, 6), D(12, 6)
+    for j in range(rows + 1):
+        t = j / rows
+        z = J["neck"].z - t * (J["neck"].z - 0.35)
+        w = 0.18 + t * 0.2
+        for i in range(cols + 1):
+            u = i / cols - 0.5
+            cape_v.append((u * 2 * w, 0.14 + t * 0.12 + 0.03 * math.cos(u * 3), z))
+    for j in range(rows):
+        for i in range(cols):
+            q = j * (cols + 1) + i
+            cape_f.append((q, q + 1, q + cols + 2, q + cols + 1))
+    cape = xm.mesh_obj("cape", cape_v, cape_f, SLOT["inner"])
+    xm.box_uv(cape, 2.0)
+    acc["cape"] = (_smooth_uv([cape]), ["chest", "spine", "hips", "thigh.L", "thigh.R"])
+    return acc
 
 
 def ribbon(J):
@@ -398,7 +489,7 @@ def ribbon(J):
         if i:
             b = len(verts) - 4
             faces.append((b, b + 1, b + 3, b + 2))
-    obj = xm.mesh_obj("ribbon", verts, faces, M("silk_crimson"), uvs)
+    obj = xm.mesh_obj("ribbon", verts, faces, SLOT["sash"], uvs)
     for p in obj.data.polygons:
         p.use_smooth = True
     return obj
@@ -596,70 +687,108 @@ def build_actions(arm):
                               "thigh.L": (-18, 0, 4), "thigh.R": (-8, 0, -4), "shin.L": (-25, 0, 0), "shin.R": (-45, 0, 0),
                               "foot.L": (30, 0, 0), "foot.R": (30, 0, 0)}))
     new_action("glide", 48, glide)
+    # townsfolk: animated conversation and a friendly wave
+    talk = []
+    for f in range(0, 49, 6):
+        ph = f / 48 * math.tau
+        talk.append((f + 1, {"upper_arm.R": (25 + 12 * math.sin(ph * 2), 0, 12), "forearm.R": (60 + 20 * math.sin(ph * 2 + 1), 0, 0),
+                             "upper_arm.L": (8 + 5 * math.sin(ph), 0, -6), "forearm.L": (30, 0, 0),
+                             "head": (4 * math.sin(ph * 2), 6 * math.sin(ph), 0), "spine": (2 * math.sin(ph), 0, 0)}))
+    new_action("talk", 48, talk)
+    wave = []
+    for f in range(0, 25, 3):
+        ph = f / 24 * math.tau
+        wave.append((f + 1, {"upper_arm.R": (20, 0, 150), "forearm.R": (10, 0, 25 * math.sin(ph * 2)),
+                             "upper_arm.L": (0, 0, -5), "head": (0, 0, 5)}))
+    new_action("wave", 24, wave)
     return actions
 
 
 # ---------------------------------------------------------------------------
 
-def build(female):
+SLOT = {}
+
+
+def slot_materials(female):
+    """Tintable material per customisation slot. Base textures are neutral
+    (white silk, fair skin, black hair) and Godot multiplies a per-variation
+    colour into albedo, so one model covers every colourway."""
+    SLOT.clear()
+    SLOT["skin"] = xm.material("skin", albedo="skin_fair_albedo", rough=0.55)
+    SLOT["hair"] = xm.material("hair", albedo="hair_black_albedo", rough=0.4)
+    SLOT["robe"] = xm.material("robe", albedo="silk_white_albedo", normal="fabric_weave_normal", rough=0.5, double_sided=True)
+    SLOT["inner"] = xm.material("inner", albedo="silk_white_albedo", normal="fabric_weave_normal", rough=0.5, double_sided=True)
+    SLOT["sash"] = xm.material("sash", albedo="silk_white_albedo", normal="fabric_weave_normal", rough=0.5, double_sided=True)
+    SLOT["boots"] = xm.material("boots", albedo="leather_belt_albedo", normal="leather_belt_normal", rough=0.7)
+
+
+def build(female, npc=False):
+    global DETAIL
+    DETAIL = 0.5 if npc else 1.0
     xg.reset_scene()
     xm._image_cache.clear()
+    slot_materials(female)
     J = proportions(female)
-    skin = M("skin_fair" if female else "skin_tan")
-    outer = M("silk_white" if female else "silk_jade")
-    inner = M("silk_crimson" if female else "silk_white")
-    trim = M("gold")
-    parts = []
+    groups = {}  # exported object name -> list of parts
 
-    def add(objs, allowed, bias=None, power=5.0):
+    def add(group, objs, allowed, bias=None, power=5.0):
         for o in (objs if isinstance(objs, list) else [objs]):
             xm.transform_apply(o)
             weight(o, J, allowed, bias, power)
-            parts.append(o)
+            groups.setdefault(group, []).append(o)
 
-    add(body(J, female, skin), ALL)
-    add(head(J, female, skin), HEADB)
-    add(hair(J, female), HEADB + ["chest"], {"head": 0.6})
-    robe_parts = robe(J, female, outer, inner, trim)
-    upper = [o for o in robe_parts if o.name.startswith(("collar", "collar_trim"))]
-    lower = [o for o in robe_parts if o not in upper]
-    add(upper, ["chest", "neck", "spine"])
-    add(lower, ["hips", "spine", "chest", "thigh.L", "thigh.R", "shin.L", "shin.R"],
+    add("body", body(J, female, SLOT["skin"]), ALL)
+    add("body", head(J, female, SLOT["skin"]), HEADB)
+    for style, objs in hair_styles(J, female).items():
+        add("hair_" + style, objs, HEADB + ["chest"], {"head": 0.6})
+    robe_parts = robe(J, female, SLOT["robe"], SLOT["inner"], M("gold"))
+    inner = [o for o in robe_parts if o.name.startswith("collar")]
+    sash = [o for o in robe_parts if o.data.materials and o.data.materials[0] in (SLOT["sash"], M("jade"))]
+    outer = [o for o in robe_parts if o not in inner and o not in sash]
+    add("inner", inner, ["chest", "neck", "spine"])
+    add("sash", sash, ["hips", "spine"])
+    add("robe", outer, ["hips", "spine", "chest", "thigh.L", "thigh.R", "shin.L", "shin.R"],
         {"hips": 0.55, "spine": 0.8, "chest": 0.8, "shin.L": 1.4, "shin.R": 1.4}, power=3.0)
-    add(sleeves(J, outer, female), ARMS)
-    add(boots(J), ["foot.L", "foot.R", "shin.L", "shin.R"])
-    if female:
-        add(ribbon(J), ARMS + ["spine"], {"chest": 0.8}, power=3.0)
-    else:
-        add(sword_on_back(J), ["chest"])
-    for o in parts:
-        if "Col" not in o.data.color_attributes:
-            xm.vcol_gradient(o, lambda co: (1.0, 1.0, 1.0))
-    name = "cultivator_female" if female else "cultivator_male"
-    mesh = xm.join(parts, name)
+    add("robe", sleeves(J, SLOT["robe"], female), ARMS)
+    add("boots", boots(J), ["foot.L", "foot.R", "shin.L", "shin.R"])
+    for name, (objs, bones) in accessories(J, female).items():
+        add("acc_" + name, objs, bones, {"chest": 0.8}, power=3.0)
     arm = build_armature(J)
-    mesh.parent = arm
-    mod = mesh.modifiers.new("Armature", "ARMATURE")
-    mod.object = arm
+    meshes = []
+    for group, objs in groups.items():
+        for o in objs:
+            if "Col" not in o.data.color_attributes:
+                xm.vcol_gradient(o, lambda co: (1.0, 1.0, 1.0))
+        mesh = xm.join(objs, group)
+        mesh.parent = arm
+        mod = mesh.modifiers.new("Armature", "ARMATURE")
+        mod.object = arm
+        meshes.append(mesh)
     build_actions(arm)
     os.makedirs(xg.CHAR_DIR, exist_ok=True)
+    name = ("npc_" if npc else "cultivator_") + ("female" if female else "male")
     path = os.path.join(xg.CHAR_DIR, name + ".glb")
-    size = xm.export_glb(path, [mesh, arm], extra_export=dict(
+    size = xm.export_glb(path, meshes + [arm], extra_export=dict(
         export_animations=True, export_animation_mode="NLA_TRACKS", export_skins=True, export_def_bones=False,
         export_force_sampling=True, export_frame_step=1, export_anim_single_armature=True, export_reset_pose_bones=True))
-    xg.log("character %s %d KB %d verts" % (name, size // 1024, len(mesh.data.vertices)))
-    return mesh, arm
+    xg.log("character %s %d KB %d verts, parts: %s" % (name, size // 1024, sum(len(m.data.vertices) for m in meshes),
+                                                       ", ".join(sorted(groups))))
+    return meshes, arm
 
 
 def main():
     args = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else sys.argv[1:]
     prev = args[args.index("--preview") + 1] if "--preview" in args else None
-    for female in (False, True):
-        mesh, arm = build(female)
-        if prev:
-            import gen_models
-            arm.data.pose_position = "REST"
-            gen_models.preview(mesh, os.path.join(prev, mesh.name + ".png"))
+    for npc in (False, True):
+        for female in (False, True):
+            meshes, arm = build(female, npc)
+            if prev:
+                import gen_models
+                arm.data.pose_position = "REST"
+                shown = [m for m in meshes if not m.name.startswith(("hair_", "acc_")) or m.name in ("hair_topknot", "hair_twin_buns")]
+                for m in meshes:
+                    m.hide_render = m not in shown
+                gen_models.preview(shown[0], os.path.join(prev, arm.name + ("_npc" if npc else "") + ("_f" if female else "_m") + ".png"))
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/world_root.gd" id="1"]
 [ext_resource type="Environment" path="res://resources/environment/world_environment.tres" id="2"]
@@ -7,6 +7,8 @@
 [ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="5"]
 [ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="6"]
 [ext_resource type="Material" path="res://resources/materials/water_material.tres" id="7"]
+[ext_resource type="Script" path="res://scripts/ui/character_creator.gd" id="8"]
+[ext_resource type="Script" path="res://scripts/world/town.gd" id="9"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_water"]
 material = ExtResource("7")
@@ -38,7 +40,13 @@ mesh = SubResource("PlaneMesh_water")
 
 [node name="Backdrop" type="Node3D" parent="."]
 
+[node name="Town" type="Node3D" parent="."]
+script = ExtResource("9")
+
 [node name="Player" parent="." instance=ExtResource("5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
 
 [node name="HUD" parent="." instance=ExtResource("6")]
+
+[node name="CharacterCreator" type="CanvasLayer" parent="."]
+script = ExtResource("8")

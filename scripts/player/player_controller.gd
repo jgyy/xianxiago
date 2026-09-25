@@ -2,8 +2,8 @@ extends CharacterBody3D
 ## Third-person cultivator movement: walk/sprint, jump, and a qinggong
 ## ("light-body technique") air leap + glide, both powered by QiSystem.
 ## The visible body is one of the Blender-made rigged cultivators (male or
-## female, toggled with C) whose idle/walk/run/jump/fall/glide animations
-## follow the movement state.
+## female, toggled with C; V opens the customiser with 100 looks each) whose
+## idle/walk/run/jump/fall/glide animations follow the movement state.
 
 const BODY_SCENES := [
 	preload("res://assets/characters/cultivator_male.glb"),
@@ -37,6 +37,7 @@ const LOOPING_ANIMS := ["idle", "walk", "run", "fall", "glide"]
 @onready var visual: Node3D = $Visual
 
 var body_type: int = 0 ## index into BODY_SCENES (0 = male, 1 = female)
+var look: Dictionary = {}
 var _body: Node3D
 var _anim: AnimationPlayer
 
@@ -50,14 +51,29 @@ func _ready() -> void:
 	spring_arm.rotation.x = deg_to_rad(-15.0)
 	set_body_type(GameState.body_type)
 
-## Swaps the visible cultivator model (0 = male, 1 = female).
+## Swaps the visible cultivator model (0 = male, 1 = female), keeping the
+## preset index chosen for that gender.
 func set_body_type(index: int) -> void:
-	body_type = posmod(index, BODY_SCENES.size())
+	var gender := posmod(index, BODY_SCENES.size())
+	var saved: Dictionary = GameState.looks.get(gender, {})
+	set_look(saved if not saved.is_empty() else CharacterLooks.preset(gender, 0))
+
+## Applies a full customisation look (see CharacterLooks).
+func set_look(new_look: Dictionary) -> void:
+	var gender: int = new_look.get("gender", 0)
+	if _body == null or gender != body_type:
+		body_type = gender
+		if _body:
+			_body.queue_free()
+		_body = BODY_SCENES[body_type].instantiate()
+		visual.add_child(_body)
+		_setup_animations()
+	look = new_look
 	GameState.body_type = body_type
-	if _body:
-		_body.queue_free()
-	_body = BODY_SCENES[body_type].instantiate()
-	visual.add_child(_body)
+	GameState.looks[body_type] = look
+	CharacterLooks.apply(_body, look)
+
+func _setup_animations() -> void:
 	_anim = _find_animation_player(_body)
 	if _anim:
 		for anim_name in LOOPING_ANIMS:

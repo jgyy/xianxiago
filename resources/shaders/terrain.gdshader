@@ -18,6 +18,13 @@ uniform sampler2D snow_albedo : source_color, filter_linear_mipmap_anisotropic, 
 uniform sampler2D snow_normal : hint_normal, filter_linear_mipmap_anisotropic, repeat_enable;
 uniform sampler2D sand_albedo : source_color, filter_linear_mipmap_anisotropic, repeat_enable;
 uniform sampler2D macro_map : filter_linear_mipmap, repeat_enable;
+uniform sampler2D paving_albedo : source_color, filter_linear_mipmap_anisotropic, repeat_enable;
+
+// Azure Cloud Town terrace (mirrors WorldStreamer.TOWN_*)
+uniform vec2 town_center = vec2(0.0, -330.0);
+uniform float town_half = 150.0;
+uniform float town_block = 44.0;
+uniform float town_street = 8.0;
 
 uniform float tile_size = 5.0;          // metres per texture repeat
 uniform float cliff_tile_size = 11.0;
@@ -64,7 +71,9 @@ void fragment() {
 	vec3 col = mix(grass, meadow, meadow_m);
 	col = mix(col, forest, forest_m);
 	// warm/cool tint drift across kilometres so fields read as varied
-	col *= mix(vec3(1.06, 1.02, 0.86), vec3(0.88, 1.02, 1.0), macro.r);
+	col *= mix(vec3(1.02, 1.0, 0.86), vec3(0.84, 0.98, 0.98), macro.r);
+	// jade-toned turf rather than lawn green
+	col = mix(vec3(dot(col, vec3(0.3, 0.59, 0.11))), col, 0.8) * vec3(0.86, 0.98, 0.9);
 	vec3 nrm = unpack_n(texture(grass_normal, uv));
 
 	// --- dirt paths / bare patches
@@ -102,6 +111,20 @@ void fragment() {
 	snow_m = hblend(snow_m, 1.0 - dot(col, vec3(0.33)), 3.0);
 	col = mix(col, snow, snow_m);
 	nrm = mix(nrm, unpack_n(texture(snow_normal, uv * 0.7)), snow_m);
+
+	// --- town: flagstone streets and plaza, packed earth in the yards
+	vec2 tl = world_pos.xz - town_center;
+	float in_town = 1.0 - smoothstep(town_half + 4.0, town_half + 14.0, max(abs(tl.x), abs(tl.y)));
+	if (in_town > 0.0) {
+		vec2 g = abs(tl - round(tl / town_block) * town_block);
+		float street = 1.0 - smoothstep(town_street * 0.5 - 0.6, town_street * 0.5 + 0.4, min(g.x, g.y));
+		float plaza = 1.0 - smoothstep(town_block - town_street * 0.5 - 0.5, town_block - town_street * 0.5 + 0.5, max(abs(tl.x), abs(tl.y)));
+		vec3 pave = texture(paving_albedo, world_pos.xz / 3.0).rgb * vec3(0.92, 0.94, 0.96);
+		vec3 yard = mix(texture(dirt_albedo, uv * 0.8).rgb, col, 0.35);
+		vec3 town_col = mix(yard, pave, max(street, plaza));
+		col = mix(col, town_col, in_town);
+		nrm = mix(nrm, vec3(0.0, 0.0, 1.0), in_town * max(street, plaza) * 0.6);
+	}
 
 	ALBEDO = col;
 	NORMAL_MAP = normalize(nrm) * 0.5 + 0.5;

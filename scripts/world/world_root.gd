@@ -22,6 +22,9 @@ func _ready() -> void:
 	water.position.y = Streamer.WATER_LEVEL
 	_dress_spawn(spawn)
 	_build_backdrop()
+	var town := get_node_or_null("Town")
+	if town:
+		town.setup(streamer, player)
 
 func _physics_process(_delta: float) -> void:
 	var p := player.global_position
