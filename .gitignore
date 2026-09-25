@@ -1,3 +1,17 @@
+# Godot 4+ specific ignores
+.godot/
+.import/
+export.cfg
+export_presets.cfg
+*.translation
+.mono/
+data_*/
+
+# Blender autosave/backups (for when 3D assets are added)
+*.blend1
+*.blend2
+*.blend3
+
 # Prerequisites
 *.d
 
