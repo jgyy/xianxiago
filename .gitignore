@@ -1,4 +1,7 @@
 # Godot 4+ specific ignores
+# .godot/ holds the per-machine import cache (imported .scn/.ctex etc.).
+# Source assets (.glb, .png, .obj, ...) and their .import sidecars ARE tracked;
+# run `godot --headless --path . --import` to regenerate the cache.
 .godot/
 .import/
 export.cfg
@@ -7,63 +10,12 @@ export_presets.cfg
 .mono/
 data_*/
 
-# Blender autosave/backups (for when 3D assets are added)
+# Blender autosave/backups (the .blend source files themselves are tracked)
 *.blend1
 *.blend2
 *.blend3
+*.blend@
 
-# Prerequisites
-*.d
-
-# Object files
-*.o
-*.ko
-*.obj
-*.elf
-
-# Linker output
-*.ilk
-*.map
-*.exp
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
-
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
-
-# Debug files
-*.dSYM/
-*.su
-*.idb
-*.pdb
-
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
-
-# debug information files
-*.dwo
+# OS / editor clutter
+.DS_Store
+Thumbs.db
