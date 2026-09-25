@@ -1,6 +1,11 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="1"]
+[ext_resource type="Material" path="res://resources/materials/grade_material.tres" id="2"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_grade"]
+material = ExtResource("2")
+size = Vector2(2, 2)
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.35
@@ -31,3 +36,8 @@ margin = 0.3
 current = true
 fov = 70.0
 far = 3000.0
+
+[node name="Grade" type="MeshInstance3D" parent="CameraPivot/SpringArm3D/Camera3D"]
+cast_shadow = 0
+extra_cull_margin = 16384.0
+mesh = SubResource("QuadMesh_grade")

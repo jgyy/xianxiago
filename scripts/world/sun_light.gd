@@ -6,19 +6,20 @@ extends DirectionalLight3D
 ## ambient light so distant hills fade into the sky's own horizon colour
 ## instead of a fixed grey.
 
-const NIGHT_COLOR := Color(0.55, 0.66, 1.0)
+const NIGHT_COLOR := Color(0.66, 0.76, 1.0)
 const HORIZON_COLOR := Color(1.0, 0.62, 0.38)
-const DAY_COLOR := Color(1.0, 0.96, 0.88)
+const DAY_COLOR := Color(1.0, 0.95, 0.84)
 
-const FOG_NIGHT := Color(0.12, 0.16, 0.28)
-const FOG_DUSK := Color(0.93, 0.66, 0.52)
-const FOG_DAY := Color(0.72, 0.82, 0.90)
+const FOG_NIGHT := Color(0.22, 0.28, 0.44)
+const FOG_DUSK := Color(0.96, 0.76, 0.62)
+const FOG_DAY := Color(0.82, 0.88, 0.87)
 
 @export var max_energy: float = 1.35
-@export var night_energy: float = 0.32
+@export var night_energy: float = 0.7
 @export var azimuth_degrees: float = 35.0
 
 var _environment: Environment
+var _grade: ShaderMaterial = load("res://resources/materials/grade_material.tres")
 
 func _ready() -> void:
 	var env_node := get_parent().get_node_or_null("WorldEnvironment") as WorldEnvironment
@@ -61,4 +62,6 @@ func _update() -> void:
 		if height < 0.35:
 			fog = FOG_NIGHT
 		_environment.fog_light_color = fog
-		_environment.ambient_light_energy = lerpf(1.6, 1.0, smoothstep(0.35, 0.7, height))
+		if _grade:
+			_grade.set_shader_parameter("mist_color", fog)
+		_environment.ambient_light_energy = lerpf(2.6, 1.0, smoothstep(0.35, 0.7, height))

@@ -11,20 +11,20 @@ uniform sampler2D mountains_far : source_color, filter_linear_mipmap, repeat_ena
 uniform sampler2D mountains_near : source_color, filter_linear_mipmap, repeat_enable;
 
 // Day palette
-uniform vec3 day_zenith : source_color = vec3(0.16, 0.40, 0.78);
-uniform vec3 day_mid : source_color = vec3(0.42, 0.68, 0.92);
-uniform vec3 day_horizon : source_color = vec3(0.93, 0.88, 0.74);
+uniform vec3 day_zenith : source_color = vec3(0.30, 0.54, 0.72);
+uniform vec3 day_mid : source_color = vec3(0.60, 0.78, 0.84);
+uniform vec3 day_horizon : source_color = vec3(0.92, 0.92, 0.86);
 // Dawn / dusk palette
-uniform vec3 dusk_zenith : source_color = vec3(0.22, 0.24, 0.52);
-uniform vec3 dusk_mid : source_color = vec3(0.78, 0.46, 0.58);
-uniform vec3 dusk_horizon : source_color = vec3(1.0, 0.62, 0.34);
+uniform vec3 dusk_zenith : source_color = vec3(0.30, 0.30, 0.52);
+uniform vec3 dusk_mid : source_color = vec3(0.88, 0.62, 0.62);
+uniform vec3 dusk_horizon : source_color = vec3(1.0, 0.78, 0.52);
 // Night palette
-uniform vec3 night_zenith : source_color = vec3(0.02, 0.04, 0.12);
-uniform vec3 night_mid : source_color = vec3(0.05, 0.09, 0.21);
-uniform vec3 night_horizon : source_color = vec3(0.12, 0.17, 0.30);
+uniform vec3 night_zenith : source_color = vec3(0.05, 0.09, 0.22);
+uniform vec3 night_mid : source_color = vec3(0.10, 0.16, 0.34);
+uniform vec3 night_horizon : source_color = vec3(0.20, 0.27, 0.45);
 // Mist that fills the valleys below the horizon line
-uniform vec3 mist_day : source_color = vec3(0.74, 0.82, 0.84);
-uniform vec3 mist_night : source_color = vec3(0.09, 0.13, 0.22);
+uniform vec3 mist_day : source_color = vec3(0.84, 0.90, 0.88);
+uniform vec3 mist_night : source_color = vec3(0.17, 0.22, 0.36);
 
 uniform vec3 sun_dir = vec3(0.0, 0.7, -0.7); // set by sun_light.gd
 uniform float cloud_speed = 0.004;

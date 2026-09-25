@@ -1,0 +1,167 @@
+[gd_resource type="Theme" load_steps=17 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/ui/paper_panel.png" id="1_paper"]
+[ext_resource type="Texture2D" path="res://assets/ui/button_normal.png" id="2_btn_n"]
+[ext_resource type="Texture2D" path="res://assets/ui/button_hover.png" id="3_btn_h"]
+[ext_resource type="Texture2D" path="res://assets/ui/button_pressed.png" id="4_btn_p"]
+[ext_resource type="Texture2D" path="res://assets/ui/prompt_plate.png" id="5_plate"]
+[ext_resource type="Texture2D" path="res://assets/ui/key_plate.png" id="6_key"]
+[ext_resource type="Texture2D" path="res://assets/ui/scroll_panel.png" id="7_scroll"]
+
+[sub_resource type="StyleBoxTexture" id="paper_panel"]
+content_margin_left = 30.0
+content_margin_top = 26.0
+content_margin_right = 30.0
+content_margin_bottom = 26.0
+texture = ExtResource("1_paper")
+texture_margin_left = 48.0
+texture_margin_top = 48.0
+texture_margin_right = 48.0
+texture_margin_bottom = 48.0
+
+[sub_resource type="StyleBoxTexture" id="plate_panel"]
+content_margin_left = 22.0
+content_margin_top = 12.0
+content_margin_right = 22.0
+content_margin_bottom = 12.0
+texture = ExtResource("5_plate")
+texture_margin_left = 30.0
+texture_margin_top = 26.0
+texture_margin_right = 30.0
+texture_margin_bottom = 26.0
+
+[sub_resource type="StyleBoxTexture" id="key_cap"]
+content_margin_left = 9.0
+content_margin_top = 4.0
+content_margin_right = 9.0
+content_margin_bottom = 5.0
+texture = ExtResource("6_key")
+texture_margin_left = 11.0
+texture_margin_top = 11.0
+texture_margin_right = 11.0
+texture_margin_bottom = 11.0
+
+[sub_resource type="StyleBoxTexture" id="scroll_panel"]
+content_margin_left = 90.0
+content_margin_top = 40.0
+content_margin_right = 90.0
+content_margin_bottom = 40.0
+texture = ExtResource("7_scroll")
+texture_margin_left = 84.0
+texture_margin_top = 50.0
+texture_margin_right = 84.0
+texture_margin_bottom = 50.0
+
+[sub_resource type="StyleBoxTexture" id="btn_normal"]
+content_margin_left = 22.0
+content_margin_top = 10.0
+content_margin_right = 22.0
+content_margin_bottom = 10.0
+texture = ExtResource("2_btn_n")
+texture_margin_left = 22.0
+texture_margin_top = 22.0
+texture_margin_right = 22.0
+texture_margin_bottom = 22.0
+
+[sub_resource type="StyleBoxTexture" id="btn_hover"]
+content_margin_left = 22.0
+content_margin_top = 10.0
+content_margin_right = 22.0
+content_margin_bottom = 10.0
+texture = ExtResource("3_btn_h")
+texture_margin_left = 22.0
+texture_margin_top = 22.0
+texture_margin_right = 22.0
+texture_margin_bottom = 22.0
+
+[sub_resource type="StyleBoxTexture" id="btn_pressed"]
+content_margin_left = 22.0
+content_margin_top = 11.0
+content_margin_right = 22.0
+content_margin_bottom = 9.0
+texture = ExtResource("4_btn_p")
+texture_margin_left = 22.0
+texture_margin_top = 22.0
+texture_margin_right = 22.0
+texture_margin_bottom = 22.0
+
+[sub_resource type="StyleBoxTexture" id="btn_disabled"]
+content_margin_left = 22.0
+content_margin_top = 10.0
+content_margin_right = 22.0
+content_margin_bottom = 10.0
+texture = ExtResource("2_btn_n")
+texture_margin_left = 22.0
+texture_margin_top = 22.0
+texture_margin_right = 22.0
+texture_margin_bottom = 22.0
+modulate_color = Color(0.6, 0.6, 0.6, 0.7)
+
+[sub_resource type="StyleBoxEmpty" id="empty"]
+
+[resource]
+default_font_size = 16
+Button/colors/font_color = Color(0.95, 0.9, 0.76, 1)
+Button/colors/font_disabled_color = Color(0.6, 0.58, 0.5, 0.8)
+Button/colors/font_focus_color = Color(1, 0.94, 0.72, 1)
+Button/colors/font_hover_color = Color(1, 0.96, 0.8, 1)
+Button/colors/font_outline_color = Color(0.02, 0.05, 0.04, 0.9)
+Button/colors/font_pressed_color = Color(0.93, 0.8, 0.5, 1)
+Button/constants/outline_size = 3
+Button/font_sizes/font_size = 18
+Button/styles/disabled = SubResource("btn_disabled")
+Button/styles/focus = SubResource("empty")
+Button/styles/hover = SubResource("btn_hover")
+Button/styles/normal = SubResource("btn_normal")
+Button/styles/pressed = SubResource("btn_pressed")
+BrushLabel/base_type = &"Label"
+BrushLabel/colors/font_color = Color(0.97, 0.92, 0.78, 1)
+BrushLabel/colors/font_outline_color = Color(0.03, 0.06, 0.05, 0.9)
+BrushLabel/colors/font_shadow_color = Color(0, 0, 0, 0.45)
+BrushLabel/constants/outline_size = 6
+BrushLabel/constants/shadow_offset_x = 2
+BrushLabel/constants/shadow_offset_y = 2
+BrushLabel/font_sizes/font_size = 26
+BrushTitle/base_type = &"Label"
+BrushTitle/colors/font_color = Color(1, 0.9, 0.62, 1)
+BrushTitle/colors/font_outline_color = Color(0.02, 0.12, 0.09, 0.95)
+BrushTitle/colors/font_shadow_color = Color(0, 0, 0, 0.5)
+BrushTitle/constants/line_spacing = -8
+BrushTitle/constants/outline_size = 8
+BrushTitle/constants/shadow_offset_x = 2
+BrushTitle/constants/shadow_offset_y = 3
+BrushTitle/font_sizes/font_size = 40
+DialGlyph/base_type = &"Label"
+DialGlyph/colors/font_color = Color(0.1, 0.09, 0.08, 1)
+DialGlyph/font_sizes/font_size = 17
+HUDText/base_type = &"Label"
+HUDText/colors/font_color = Color(0.93, 0.95, 0.88, 1)
+HUDText/colors/font_outline_color = Color(0.02, 0.05, 0.04, 0.85)
+HUDText/constants/outline_size = 4
+HUDText/font_sizes/font_size = 15
+InkBrushLabel/base_type = &"Label"
+InkBrushLabel/colors/font_color = Color(0.07, 0.07, 0.08, 1)
+InkBrushLabel/font_sizes/font_size = 32
+InkLabel/base_type = &"Label"
+InkLabel/colors/font_color = Color(0.1, 0.09, 0.08, 1)
+InkLabel/font_sizes/font_size = 15
+KeyCap/base_type = &"PanelContainer"
+KeyCap/styles/panel = SubResource("key_cap")
+KeyLabel/base_type = &"Label"
+KeyLabel/colors/font_color = Color(0.98, 0.88, 0.6, 1)
+KeyLabel/font_sizes/font_size = 12
+Label/colors/font_color = Color(0.95, 0.92, 0.84, 1)
+Label/colors/font_outline_color = Color(0.03, 0.05, 0.05, 0.85)
+Label/constants/outline_size = 0
+Panel/styles/panel = SubResource("paper_panel")
+PanelContainer/styles/panel = SubResource("paper_panel")
+PlatePanel/base_type = &"PanelContainer"
+PlatePanel/styles/panel = SubResource("plate_panel")
+PopupPanel/styles/panel = SubResource("paper_panel")
+ScrollPanel/base_type = &"PanelContainer"
+ScrollPanel/styles/panel = SubResource("scroll_panel")
+SealGlyph/base_type = &"Label"
+SealGlyph/colors/font_color = Color(0.99, 0.93, 0.82, 1)
+SealGlyph/font_sizes/font_size = 30
+TooltipLabel/colors/font_color = Color(0.95, 0.9, 0.76, 1)
+TooltipPanel/styles/panel = SubResource("plate_panel")

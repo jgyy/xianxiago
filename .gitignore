@@ -23,3 +23,6 @@ Thumbs.db
 # Python bytecode from the Blender generators
 __pycache__/
 *.pyc
+
+# Claude Code local worktrees
+.claude/

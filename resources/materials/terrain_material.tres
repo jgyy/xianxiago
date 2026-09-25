@@ -1,4 +1,4 @@
-[gd_resource type="ShaderMaterial" load_steps=15 format=3]
+[gd_resource type="ShaderMaterial" load_steps=16 format=3]
 
 [ext_resource type="Shader" path="res://resources/shaders/terrain.gdshader" id="1"]
 [ext_resource type="Texture2D" path="res://assets/textures/terrain_grass_albedo.png" id="2"]
@@ -15,6 +15,7 @@
 [ext_resource type="Texture2D" path="res://assets/textures/terrain_snow_normal.png" id="13"]
 [ext_resource type="Texture2D" path="res://assets/textures/terrain_sand_albedo.png" id="14"]
 [ext_resource type="Texture2D" path="res://assets/textures/terrain_macro.png" id="15"]
+[ext_resource type="Texture2D" path="res://assets/textures/stone_paving_albedo.png" id="16"]
 
 [resource]
 shader = ExtResource("1")
@@ -32,3 +33,4 @@ shader_parameter/snow_albedo = ExtResource("12")
 shader_parameter/snow_normal = ExtResource("13")
 shader_parameter/sand_albedo = ExtResource("14")
 shader_parameter/macro_map = ExtResource("15")
+shader_parameter/paving_albedo = ExtResource("16")

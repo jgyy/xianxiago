@@ -1,47 +1,474 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=22 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/hud.gd" id="1"]
+[ext_resource type="Theme" path="res://assets/ui/xianxia_theme.tres" id="2_theme"]
+[ext_resource type="Texture2D" path="res://assets/ui/vignette.png" id="3_vignette"]
+[ext_resource type="Texture2D" path="res://assets/ui/jade_plaque.png" id="4_plaque"]
+[ext_resource type="Texture2D" path="res://assets/ui/seal_stamp.png" id="5_seal"]
+[ext_resource type="Texture2D" path="res://assets/ui/ink_stroke.png" id="6_ink"]
+[ext_resource type="Texture2D" path="res://assets/ui/qi_ring_glow.png" id="7_glow"]
+[ext_resource type="Texture2D" path="res://assets/ui/qi_ring_under.png" id="8_under"]
+[ext_resource type="Texture2D" path="res://assets/ui/qi_ring_fill.png" id="9_fill"]
+[ext_resource type="Texture2D" path="res://assets/ui/qi_ring_over.png" id="10_over"]
+[ext_resource type="Texture2D" path="res://assets/ui/icon_qi.png" id="11_iconqi"]
+[ext_resource type="Texture2D" path="res://assets/ui/sundial_face.png" id="12_dial"]
+[ext_resource type="Texture2D" path="res://assets/ui/sundial_frame.png" id="13_frame"]
+[ext_resource type="Texture2D" path="res://assets/ui/prompt_plate.png" id="14_plate"]
+[ext_resource type="Texture2D" path="res://assets/ui/icon_sun.png" id="15_sun"]
+[ext_resource type="Texture2D" path="res://assets/ui/icon_moon.png" id="16_moon"]
+[ext_resource type="Texture2D" path="res://assets/ui/scroll_panel.png" id="17_scroll"]
+[ext_resource type="Texture2D" path="res://assets/ui/cloud_ornament.png" id="18_cloud"]
+[ext_resource type="Texture2D" path="res://assets/ui/gold_corner.png" id="19_corner"]
+[ext_resource type="Texture2D" path="res://assets/ui/icon_lotus.png" id="20_lotus"]
+[ext_resource type="Texture2D" path="res://assets/ui/icon_sword.png" id="21_sword"]
 
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1")
 
-[node name="Panel" type="Control" parent="."]
-anchor_left = 0.0
-anchor_top = 0.0
-anchor_right = 0.0
-anchor_bottom = 0.0
-offset_left = 16.0
-offset_top = 16.0
-offset_right = 300.0
-offset_bottom = 112.0
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+[node name="Root" type="Control" parent="."]
+texture_filter = 4
+layout_mode = 3
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-theme_override_constants/separation = 4
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("2_theme")
 
-[node name="RealmLabel" type="Label" parent="Panel/VBoxContainer"]
+[node name="Vignette" type="TextureRect" parent="Root"]
+modulate = Color(1, 1, 1, 0.85)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_vignette")
+expand_mode = 1
+
+[node name="RealmPanel" type="Control" parent="Root"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 18.0
+offset_top = 14.0
+offset_right = 398.0
+offset_bottom = 262.0
+mouse_filter = 2
+
+[node name="Plaque" type="TextureRect" parent="Root/RealmPanel"]
+layout_mode = 0
+offset_right = 92.0
+offset_bottom = 184.0
+mouse_filter = 2
+texture = ExtResource("4_plaque")
+expand_mode = 1
+
+[node name="RealmGlyphs" type="Label" parent="Root/RealmPanel/Plaque"]
 unique_name_in_owner = true
-theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.92, 0.94, 0.86, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.6)
-theme_override_constants/shadow_offset_x = 1
-theme_override_constants/shadow_offset_y = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 4.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"BrushTitle"
+text = "凡
+人"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Seal" type="TextureRect" parent="Root/RealmPanel"]
+layout_mode = 0
+offset_left = 58.0
+offset_top = 150.0
+offset_right = 104.0
+offset_bottom = 196.0
+rotation = -0.1
+pivot_offset = Vector2(23, 23)
+mouse_filter = 2
+texture = ExtResource("5_seal")
+expand_mode = 1
+
+[node name="SealGlyph" type="Label" parent="Root/RealmPanel/Seal"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"SealGlyph"
+theme_override_font_sizes/font_size = 28
+text = "境"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="InkStroke" type="TextureRect" parent="Root/RealmPanel"]
+modulate = Color(1, 1, 1, 0.82)
+layout_mode = 0
+offset_left = 98.0
+offset_top = 34.0
+offset_right = 358.0
+offset_bottom = 66.0
+mouse_filter = 2
+texture = ExtResource("6_ink")
+expand_mode = 1
+
+[node name="RealmLabel" type="Label" parent="Root/RealmPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 108.0
+offset_top = 4.0
+offset_right = 398.0
+offset_bottom = 44.0
+theme_type_variation = &"BrushLabel"
 text = "Mortal"
+vertical_alignment = 1
 
-[node name="TimeLabel" type="Label" parent="Panel/VBoxContainer"]
-unique_name_in_owner = true
-theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 1)
-text = "08:00"
+[node name="RealmSub" type="Label" parent="Root/RealmPanel"]
+layout_mode = 0
+offset_left = 112.0
+offset_top = 60.0
+offset_right = 380.0
+offset_bottom = 80.0
+theme_type_variation = &"HUDText"
+theme_override_colors/font_color = Color(0.72, 0.93, 0.82, 1)
+theme_override_font_sizes/font_size = 14
+text = "境界 · Cultivation Realm"
 
-[node name="QiLabel" type="Label" parent="Panel/VBoxContainer"]
+[node name="QiGauge" type="Control" parent="Root/RealmPanel"]
 unique_name_in_owner = true
-theme_override_colors/font_color = Color(0.6, 0.9, 0.85, 1)
-text = "Qi 100 / 100"
+anchors_preset = 0
+offset_left = 104.0
+offset_top = 86.0
+offset_right = 254.0
+offset_bottom = 236.0
+mouse_filter = 2
 
-[node name="QiBar" type="ProgressBar" parent="Panel/VBoxContainer"]
+[node name="QiGlow" type="TextureRect" parent="Root/RealmPanel/QiGauge"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(240, 16)
-max_value = 100.0
+modulate = Color(1, 1, 1, 0)
+layout_mode = 0
+offset_left = -32.0
+offset_top = -32.0
+offset_right = 182.0
+offset_bottom = 182.0
+pivot_offset = Vector2(107, 107)
+mouse_filter = 2
+texture = ExtResource("7_glow")
+expand_mode = 1
+
+[node name="QiBar" type="TextureProgressBar" parent="Root/RealmPanel/QiGauge"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 512.0
+offset_bottom = 512.0
+scale = Vector2(0.29296875, 0.29296875)
+mouse_filter = 2
+step = 0.01
 value = 100.0
-show_percentage = false
+fill_mode = 4
+texture_under = ExtResource("8_under")
+texture_over = ExtResource("10_over")
+texture_progress = ExtResource("9_fill")
+
+[node name="QiIcon" type="TextureRect" parent="Root/RealmPanel/QiGauge"]
+layout_mode = 0
+offset_left = 62.0
+offset_top = 34.0
+offset_right = 88.0
+offset_bottom = 60.0
+mouse_filter = 2
+texture = ExtResource("11_iconqi")
+expand_mode = 1
+
+[node name="QiLabel" type="Label" parent="Root/RealmPanel/QiGauge"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 15.0
+offset_top = 60.0
+offset_right = 135.0
+offset_bottom = 84.0
+theme_type_variation = &"HUDText"
+theme_override_font_sizes/font_size = 17
+text = "100 / 100"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="QiCaption" type="Label" parent="Root/RealmPanel/QiGauge"]
+layout_mode = 0
+offset_left = 15.0
+offset_top = 84.0
+offset_right = 135.0
+offset_bottom = 106.0
+theme_type_variation = &"BrushLabel"
+theme_override_colors/font_color = Color(0.66, 0.95, 0.8, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 16
+text = "气 · Qi"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Clock" type="Control" parent="Root"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -212.0
+offset_top = 12.0
+offset_right = -16.0
+offset_bottom = 252.0
+grow_horizontal = 0
+mouse_filter = 2
+
+[node name="DialRoot" type="Control" parent="Root/Clock"]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 10.0
+offset_right = 186.0
+offset_bottom = 176.0
+pivot_offset = Vector2(88, 88)
+mouse_filter = 2
+
+[node name="DialFace" type="TextureRect" parent="Root/Clock/DialRoot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("12_dial")
+expand_mode = 1
+
+[node name="DialFrame" type="TextureRect" parent="Root/Clock"]
+layout_mode = 0
+offset_left = 10.0
+offset_right = 186.0
+offset_bottom = 176.0
+mouse_filter = 2
+texture = ExtResource("13_frame")
+expand_mode = 1
+
+[node name="ClockPlate" type="NinePatchRect" parent="Root/Clock"]
+layout_mode = 0
+offset_top = 174.0
+offset_right = 196.0
+offset_bottom = 238.0
+mouse_filter = 2
+texture = ExtResource("14_plate")
+patch_margin_left = 30
+patch_margin_top = 26
+patch_margin_right = 30
+patch_margin_bottom = 26
+
+[node name="SunIcon" type="TextureRect" parent="Root/Clock/ClockPlate"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 12.0
+offset_top = 13.0
+offset_right = 50.0
+offset_bottom = 51.0
+mouse_filter = 2
+texture = ExtResource("15_sun")
+expand_mode = 1
+
+[node name="MoonIcon" type="TextureRect" parent="Root/Clock/ClockPlate"]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
+layout_mode = 0
+offset_left = 12.0
+offset_top = 13.0
+offset_right = 50.0
+offset_bottom = 51.0
+mouse_filter = 2
+texture = ExtResource("16_moon")
+expand_mode = 1
+
+[node name="ShichenLabel" type="Label" parent="Root/Clock/ClockPlate"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 52.0
+offset_top = 4.0
+offset_right = 186.0
+offset_bottom = 36.0
+theme_type_variation = &"BrushLabel"
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 25
+text = "辰时"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TimeLabel" type="Label" parent="Root/Clock/ClockPlate"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 52.0
+offset_top = 34.0
+offset_right = 186.0
+offset_bottom = 56.0
+theme_type_variation = &"HUDText"
+theme_override_colors/font_color = Color(0.95, 0.86, 0.62, 1)
+theme_override_font_sizes/font_size = 14
+text = "Chén · 08:00"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Toast" type="Control" parent="Root"]
+unique_name_in_owner = true
+visible = false
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = 150.0
+offset_right = 200.0
+offset_bottom = 234.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="CloudLeft" type="TextureRect" parent="Root/Toast"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -84.0
+offset_top = 20.0
+offset_right = 12.0
+offset_bottom = 68.0
+mouse_filter = 2
+texture = ExtResource("18_cloud")
+expand_mode = 1
+flip_h = true
+
+[node name="CloudRight" type="TextureRect" parent="Root/Toast"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 388.0
+offset_top = 20.0
+offset_right = 484.0
+offset_bottom = 68.0
+mouse_filter = 2
+texture = ExtResource("18_cloud")
+expand_mode = 1
+
+[node name="ToastPaper" type="NinePatchRect" parent="Root/Toast"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 800.0
+offset_bottom = 168.0
+scale = Vector2(0.5, 0.5)
+mouse_filter = 2
+texture = ExtResource("17_scroll")
+patch_margin_left = 84
+patch_margin_top = 50
+patch_margin_right = 84
+patch_margin_bottom = 50
+
+[node name="ToastCornerTL" type="TextureRect" parent="Root/Toast"]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.9)
+layout_mode = 0
+offset_left = 44.0
+offset_top = 12.0
+offset_right = 72.0
+offset_bottom = 40.0
+mouse_filter = 2
+texture = ExtResource("19_corner")
+expand_mode = 1
+
+[node name="ToastCornerBR" type="TextureRect" parent="Root/Toast"]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.9)
+layout_mode = 0
+offset_left = 328.0
+offset_top = 44.0
+offset_right = 356.0
+offset_bottom = 72.0
+rotation = 3.14159
+pivot_offset = Vector2(14, 14)
+mouse_filter = 2
+texture = ExtResource("19_corner")
+expand_mode = 1
+
+[node name="ToastLabel" type="Label" parent="Root/Toast"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"InkBrushLabel"
+text = "Azure Cloud Town"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="KeyHints" type="Control" parent="Root"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -450.0
+offset_top = -84.0
+offset_right = 450.0
+offset_bottom = -14.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="HintPaper" type="NinePatchRect" parent="Root/KeyHints"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 1800.0
+offset_bottom = 140.0
+scale = Vector2(0.5, 0.5)
+mouse_filter = 2
+texture = ExtResource("17_scroll")
+patch_margin_left = 84
+patch_margin_top = 50
+patch_margin_right = 84
+patch_margin_bottom = 50
+
+[node name="HintLotus" type="TextureRect" parent="Root/KeyHints"]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 22.0
+offset_right = 76.0
+offset_bottom = 48.0
+mouse_filter = 2
+texture = ExtResource("20_lotus")
+expand_mode = 1
+
+[node name="HintSword" type="TextureRect" parent="Root/KeyHints"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 824.0
+offset_top = 22.0
+offset_right = 850.0
+offset_bottom = 48.0
+mouse_filter = 2
+texture = ExtResource("21_sword")
+expand_mode = 1
+
+[node name="HintRow" type="HBoxContainer" parent="Root/KeyHints"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 82.0
+offset_top = 14.0
+offset_right = -82.0
+offset_bottom = -14.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 14
+alignment = 1

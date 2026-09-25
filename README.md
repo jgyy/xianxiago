@@ -10,11 +10,14 @@ cultivator controller with sprint, jump, and a qinggong (light-body) air-leap
 + glide, all powered by a qi resource, walking on procedurally streamed
 open-world terrain with a day/night cycle.
 
-All art is generated with headless Blender scripts: 100 textures, 98
-world models and two rigged, animated cultivator characters (male and
-female). The terrain is splatted with those textures by height, slope and
-biome, and the sky is a painted shader with clouds, mountain silhouettes,
-dusk colours and stars. See `docs/DESIGN.md` for how it's built and
+All art and audio are generated with headless Blender (5.0) scripts:
+textures, world models, 100+ town buildings, rigged cultivators and NPCs,
+and 100 procedural sound effects and music tracks. The world is graded in
+an ink-and-jade Xianxia palette: celadon skies, jade mist in the valleys,
+vermilion and gold architecture. It includes **Azure Cloud Town**, a walled
+market town north of the spawn shrine with 220 townsfolk. Your cultivator
+can be customised (male or female, 100 named looks each, plus per-slot
+colours, hair styles and adornments). See `docs/DESIGN.md` for how it's built and
 `docs/ROADMAP.md` for what's next.
 
 | | |
@@ -59,6 +62,8 @@ parse, so its node falls back to a plain `Node3D`.)
 | Sprint | Shift (held) |
 | Light-body glide | Ctrl (held, while falling) |
 | Switch cultivator (male / female) | C |
+| Cultivator's Mirror (customise look) | V |
+| Show key hints | F1 |
 | Toggle mouse capture | Esc |
 
 ## Project layout
@@ -70,7 +75,10 @@ scripts/               GDScript sources, mirrored by folder (systems/, player/, 
 resources/             Environment, shaders (terrain, sky, water), materials
 assets/textures/       100 Blender-baked PNG textures (shared by everything)
 assets/models/         98 Blender-generated .glb world models
-assets/characters/     Rigged + animated male/female cultivators (.glb)
+assets/characters/     Rigged + animated cultivators and NPCs with swappable parts (.glb)
+assets/buildings/      Town buildings (.glb) + manifest.json used by the town layout
+assets/audio/          Procedural music and sound effects (.ogg)
+assets/ui/, fonts/     HUD art baked in Blender, calligraphy font (OFL)
 tools/blender/         Headless-Blender generators for all of the above
 docs/                  DESIGN.md (architecture) and ROADMAP.md (what's next)
 ```
