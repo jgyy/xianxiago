@@ -84,4 +84,3 @@ toggle_mouse_capture={
 
 renderer/rendering_method="forward_plus"
 anti_aliasing/quality/screen_space_aa=1
-environment/defaults/default_environment="res://resources/environment/world_environment.tres"
